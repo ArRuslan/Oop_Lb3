@@ -1,6 +1,7 @@
 ﻿using System;
 
 namespace Lb3_Cli {
+[Serializable]
 public abstract class Figure {
     public Point Location = new Point();
     public double Scale { get; set; } = 1;
@@ -31,6 +32,7 @@ public abstract class Figure {
     }
 }
 
+[Serializable]
 public class Point {
     public Point() : this(0, 0) {}
     
@@ -47,6 +49,7 @@ public class Point {
     } 
 }
 
+[Serializable]
 class Circle : Figure {
     public Circle() : this(50) {}
 
@@ -70,6 +73,7 @@ class Circle : Figure {
     }
 }
 
+[Serializable]
 class FilledCircle : Circle {
     public FilledCircle() : this(0) {}
     
@@ -85,6 +89,7 @@ class FilledCircle : Circle {
     }
 }
 
+[Serializable]
 class Ellipse : Figure {
     public Ellipse() : this(50, 75) {}
     
@@ -110,6 +115,7 @@ class Ellipse : Figure {
     }
 }
 
+[Serializable]
 class Cone : Figure {
     public double Radius { get; set; }
     public double Height { get; set; }
@@ -136,6 +142,7 @@ class Cone : Figure {
     }
 }
 
+[Serializable]
 class TruncatedCone : Figure {
     public double RadiusTop { get; set; }
     public double RadiusBottom { get; set; }

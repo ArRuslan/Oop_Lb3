@@ -1,6 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace Lb3_Cli { 
+[Serializable]
 public class Image : Figure {
     public double Width { get; set; }
     public double Height { get; set; }
@@ -70,6 +74,19 @@ public class Image : Figure {
         get {
             return Figures[idx];
         }
+    }
+    
+    public void SaveToFile(string path) {
+        BinaryFormatter formatter = new BinaryFormatter();
+        Stream stream = new FileStream(path, FileMode.Create, FileAccess.Write);
+        formatter.Serialize(stream, this);
+        stream.Close();
+    }
+    
+    public static Image LoadFromFile(string path) {
+        BinaryFormatter formatter = new BinaryFormatter();
+        Stream stream = new FileStream(path, FileMode.Open, FileAccess.Read);
+        return (Image) formatter.Deserialize(stream);
     }
     
     public override string ToString() {

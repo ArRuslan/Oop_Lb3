@@ -6,9 +6,14 @@ class Program {
         TruncatedCone tc = new TruncatedCone(50, 25, 10);
         tc.Scale = 5;
         
-        Image i = new Image();
-        i.Figures.Add(tc);
-        Console.WriteLine(i);
+        Image image = new Image();
+        image.Figures.Add(tc);
+        Console.WriteLine(image);
+        image.SaveToFile("serializationTest");
+        
+        Image deserializedImage = Image.LoadFromFile("serializationTest");
+        Console.WriteLine(deserializedImage);
+        Console.WriteLine(deserializedImage.ToString() == image.ToString());
     } 
 }
 }
