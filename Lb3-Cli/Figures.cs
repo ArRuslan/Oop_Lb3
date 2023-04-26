@@ -122,6 +122,8 @@ class Cone : Figure {
     
     public double Volume => Math.PI * Math.Pow(Scaled(Radius), 2) * Scaled(Height) / 3;
 
+    public Cone() : this(50, 10) {}
+    
     public Cone(double radius, double height) {
         Radius = radius;
         Height = height;
@@ -149,6 +151,8 @@ class TruncatedCone : Figure {
     public double Height { get; set; }
         
     public double Volume => Math.PI * Scaled(Height) * (Math.Pow(Scaled(RadiusTop), 2) + Scaled(RadiusTop) * Scaled(RadiusBottom) + Math.Pow(Scaled(RadiusBottom), 2)) / 3;
+
+    public TruncatedCone() : this(50, 25, 10) {}
 
     public TruncatedCone(double radiusBottom, double radiusTop, double height) {
         RadiusTop = radiusTop;

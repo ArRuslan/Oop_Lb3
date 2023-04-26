@@ -7,7 +7,13 @@ class Program {
         tc.Scale = 5;
         
         Image image = new Image();
+        
         image.Figures.Add(tc);
+        image.Figures.Add(new Circle());
+        image.Figures.Add(new FilledCircle());
+        image.Figures.Add(new Cone());
+        image.Figures.Add(new Ellipse());
+        
         Console.WriteLine(image);
         image.SaveToFile("serializationTest");
         
