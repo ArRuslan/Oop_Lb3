@@ -2,6 +2,10 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lb3-Cli", "Lb3-Cli\Lb3-Cli.csproj", "{5FB65D03-F65D-4C22-B7E3-7122D1DC8285}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lb3-Gui", "Lb3-Gui\Lb3-Gui.csproj", "{D5B8C325-F70B-4890-9264-62F4C5035200}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lib", "Lib\Lib.csproj", "{63031965-A479-4B54-928A-8573437D9C98}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +16,13 @@ Global
 		{5FB65D03-F65D-4C22-B7E3-7122D1DC8285}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5FB65D03-F65D-4C22-B7E3-7122D1DC8285}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5FB65D03-F65D-4C22-B7E3-7122D1DC8285}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D5B8C325-F70B-4890-9264-62F4C5035200}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D5B8C325-F70B-4890-9264-62F4C5035200}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D5B8C325-F70B-4890-9264-62F4C5035200}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D5B8C325-F70B-4890-9264-62F4C5035200}.Release|Any CPU.Build.0 = Release|Any CPU
+		{63031965-A479-4B54-928A-8573437D9C98}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{63031965-A479-4B54-928A-8573437D9C98}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{63031965-A479-4B54-928A-8573437D9C98}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{63031965-A479-4B54-928A-8573437D9C98}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

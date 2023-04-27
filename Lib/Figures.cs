@@ -1,9 +1,10 @@
 ﻿using System;
 
-namespace Lb3_Cli {
+namespace Lib {
 [Serializable]
 public abstract class Figure {
     public Point Location = new Point();
+    public Image ParentImage { get; set; } = null;
     public double Scale { get; set; } = 1;
     
     public void Move(double x = 0, double y = 0) {
@@ -23,12 +24,37 @@ public abstract class Figure {
     }
 
     public virtual double Scaled(double val) {
-        return Scale * val;
+        return Scale * val * (ParentImage != null ? ParentImage.Scale : 1);
     }
     
     public override string ToString() {
         return $"{GetType().Name}(Location = {Location}, Area = {GetArea()}, Perimeter = {GetPerimeter()}, " +
                $"Scale = {Scale})";
+    }
+    
+    public virtual string ToInfoString(string p = "") {
+        return $"{p}{GetType().Name}:\n" +
+               $"{p}{p}  Location = {Location}\n" +
+               $"{p}{p}  Area = {GetArea()}\n" +
+               $"{p}{p}  Perimeter = {GetPerimeter()}\n" +
+               $"{p}{p}  Scale = {Scale}";
+    }
+    
+    public static Figure Get(string name) {
+        switch (name) {
+            case "Circle":
+                return new Circle();
+            case "FilledCircle":
+                return new FilledCircle();
+            case "Ellipse":
+                return new Ellipse();
+            case "Cone":
+                return new Cone();
+            case "TruncatedCone":
+                return new TruncatedCone();
+            default:
+                return new Circle();
+        }
     }
 }
 
@@ -50,7 +76,7 @@ public class Point {
 }
 
 [Serializable]
-class Circle : Figure {
+public class Circle : Figure {
     public Circle() : this(50) {}
 
     public Circle(double radius) {
@@ -71,10 +97,19 @@ class Circle : Figure {
         return $"Circle(Location = {Location}, Area = {GetArea()}, Perimeter = {GetPerimeter()}, " +
                $"Scale = {Scale}, Radius = {Radius})";
     }
+    
+    public override string ToInfoString(string p = "") {
+        return $"{p}Circle:\n" +
+               $"{p}{p}  Location = {Location}\n" +
+               $"{p}{p}  Area = {GetArea()}\n" +
+               $"{p}{p}  Perimeter = {GetPerimeter()}\n" +
+               $"{p}{p}  Scale = {Scale}\n" +
+               $"{p}{p}  Radius = {Radius}";
+    }
 }
 
 [Serializable]
-class FilledCircle : Circle {
+public class FilledCircle : Circle {
     public FilledCircle() : this(0) {}
     
     public FilledCircle(long color) {
@@ -87,10 +122,20 @@ class FilledCircle : Circle {
         return $"FilledCircle(Location = {Location}, Area = {GetArea()}, Perimeter = {GetPerimeter()}, " +
                $"Scale = {Scale}, Radius = {Radius}, Color = {Color})";
     }
+    
+    public override string ToInfoString(string p = "") {
+        return $"{p}FilledCircle:\n" +
+               $"{p}{p}  Location = {Location}\n" +
+               $"{p}{p}  Area = {GetArea()}\n" +
+               $"{p}{p}  Perimeter = {GetPerimeter()}\n" +
+               $"{p}{p}  Scale = {Scale}\n" +
+               $"{p}{p}  Radius = {Radius}\n" +
+               $"{p}{p}  Color = {Color}";
+    }
 }
 
 [Serializable]
-class Ellipse : Figure {
+public class Ellipse : Figure {
     public Ellipse() : this(50, 75) {}
     
     public Ellipse(double width, double height) {
@@ -113,10 +158,20 @@ class Ellipse : Figure {
         return $"Ellipse(Location = {Location}, Area = {GetArea()}, Perimeter = {GetPerimeter()}, " +
                $"Scale = {Scale}, Width = {Width}, Height = {Height})";
     }
+    
+    public override string ToInfoString(string p = "") {
+        return $"{p}Ellipse:\n" +
+               $"{p}{p}  Location = {Location}\n" +
+               $"{p}{p}  Area = {GetArea()}\n" +
+               $"{p}{p}  Perimeter = {GetPerimeter()}\n" +
+               $"{p}{p}  Scale = {Scale}\n" +
+               $"{p}{p}  Width = {Width}\n" +
+               $"{p}{p}  Height = {Height}";
+    }
 }
 
 [Serializable]
-class Cone : Figure {
+public class Cone : Figure {
     public double Radius { get; set; }
     public double Height { get; set; }
     
@@ -142,10 +197,21 @@ class Cone : Figure {
         return $"Cone(Location = {Location}, ProjectionArea = {GetArea()}, ProjectionPerimeter = {GetPerimeter()}, " +
                $"Scale = {Scale}, Radius = {Radius}, Height = {Height}, Volume = {Volume})";
     }
+    
+    public override string ToInfoString(string p = "") {
+        return $"{p}Cone:\n" +
+               $"{p}{p}  Location = {Location}\n" +
+               $"{p}{p}  Area = {GetArea()}\n" +
+               $"{p}{p}  Perimeter = {GetPerimeter()}\n" +
+               $"{p}{p}  Scale = {Scale}\n" +
+               $"{p}{p}  Radius = {Radius}\n" +
+               $"{p}{p}  Height = {Height}\n" +
+               $"{p}{p}  Volume = {Volume}";
+    }
 }
 
 [Serializable]
-class TruncatedCone : Figure {
+public class TruncatedCone : Figure {
     public double RadiusTop { get; set; }
     public double RadiusBottom { get; set; }
     public double Height { get; set; }
@@ -173,6 +239,18 @@ class TruncatedCone : Figure {
         return $"TruncatedCone(Location = {Location}, ProjectionArea = {GetArea()}, " +
                $"ProjectionPerimeter = {GetPerimeter()}, Scale = {Scale}, RadiusTop = {RadiusTop}, " +
                $"RadiusBottom = {RadiusBottom}, Height = {Height}, Volume = {Volume})";
+    }
+    
+    public override string ToInfoString(string p = "") {
+        return $"{p}TruncatedCone:\n" +
+               $"{p}{p}  Location = {Location}\n" +
+               $"{p}{p}  ProjectionArea = {GetArea()}\n" +
+               $"{p}{p}  ProjectionPerimeter = {GetPerimeter()}\n" +
+               $"{p}{p}  Scale = {Scale}\n" +
+               $"{p}{p}  RadiusTop = {RadiusTop}\n" +
+               $"{p}{p}  RadiusBottom = {RadiusBottom}\n" +
+               $"{p}{p}  Height = {Height}\n" +
+               $"{p}{p}  Volume = {Volume}";
     }
 }
 

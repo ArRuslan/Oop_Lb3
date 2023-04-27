@@ -1,4 +1,5 @@
 ﻿using System;
+using Lib;
 
 namespace Lb3_Cli {
 class Program {

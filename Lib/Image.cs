@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 
-namespace Lb3_Cli { 
+namespace Lib { 
 [Serializable]
 public class Image : Figure {
     public double Width { get; set; }
@@ -11,12 +11,24 @@ public class Image : Figure {
     public List<Figure> Figures { get; } = new List<Figure>();
     public string FiguresString {
         get {
+            if(Figures.Count == 0) return "";
             string result = "";
             foreach(Figure figure in Figures) {
                 result += $"{figure}, ";
             }
             result = result.Trim();
             result = result.Remove(result.Length - 1, 1);
+            return result;
+        }
+    }
+    public string FiguresInfoString {
+        get {
+            if(Figures.Count == 0) return "";
+            string result = "";
+            foreach(Figure figure in Figures) {
+                result += "  "+figure.ToInfoString("  ") + "\n";
+            }
+            result = result.TrimEnd();
             return result;
         }
     }
@@ -70,13 +82,9 @@ public class Image : Figure {
         }
     }
 
-    public Figure this[int idx] {
-        get {
-            return Figures[idx];
-        }
-    }
-    
-    public void SaveToFile(string path) {
+    public Figure this[int idx] => Figures[idx];
+
+public void SaveToFile(string path) {
         BinaryFormatter formatter = new BinaryFormatter();
         Stream stream = new FileStream(path, FileMode.Create, FileAccess.Write);
         formatter.Serialize(stream, this);
@@ -89,9 +97,25 @@ public class Image : Figure {
         return (Image) formatter.Deserialize(stream);
     }
     
+    public void AddFigure(Figure figure) {
+        Figures.Add(figure);
+        figure.ParentImage = this;
+    }
+    
     public override string ToString() {
-        return $"FilledCircle(Location = {Location}, Area = {GetArea()}, Perimeter = {GetPerimeter()}, " +
+        return $"Image(Location = {Location}, Area = {GetArea()}, Perimeter = {GetPerimeter()}, " +
                $"Scale = {Scale}, Figures = [{FiguresString}])";
+    }
+    
+    public override string ToInfoString(string p = "") {
+        return $"Image: \n" + 
+               $"  Location = {Location}\n" +
+               $"  Area = {GetArea()}\n" +
+               $"  Perimeter = {GetPerimeter()}\n" +
+               $"  Sum of areas = {GetAreas()}\n" +
+               $"  Sum of perimeters = {GetPerimeters()}\n" +
+               $"  Scale = {Scale}\n" +
+               $"  Figures = [\n{FiguresInfoString}\n]";
     }
 }
 }
