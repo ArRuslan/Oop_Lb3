@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Windows.Controls;
 
 namespace Lib { 
 [Serializable]
@@ -78,13 +79,13 @@ public class Image : Figure {
     
     public void Merge(Image other) {
         foreach (Figure figure in other.Figures) {
-            Figures.Add(figure);
+            AddFigure(figure);
         }
     }
 
     public Figure this[int idx] => Figures[idx];
 
-public void SaveToFile(string path) {
+    public void SaveToFile(string path) {
         BinaryFormatter formatter = new BinaryFormatter();
         Stream stream = new FileStream(path, FileMode.Create, FileAccess.Write);
         formatter.Serialize(stream, this);
@@ -115,7 +116,9 @@ public void SaveToFile(string path) {
                $"  Sum of areas = {GetAreas()}\n" +
                $"  Sum of perimeters = {GetPerimeters()}\n" +
                $"  Scale = {Scale}\n" +
-               $"  Figures = [\n{FiguresInfoString}\n]";
+               $"  Figures = [\n{FiguresInfoString}\n  ]";
     }
+    
+    public override void Draw(Canvas cv) {}
 }
 }

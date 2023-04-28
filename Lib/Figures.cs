@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Windows.Controls;
+using System.Windows.Media;
+using System.Windows.Shapes;
 
 namespace Lib {
 [Serializable]
@@ -6,7 +9,9 @@ public abstract class Figure {
     public Point Location = new Point();
     public Image ParentImage { get; set; } = null;
     public double Scale { get; set; } = 1;
-    
+    public double X => Scaled(Location.X) + (ParentImage != null ? ParentImage.X : 0);
+    public double Y => Scaled(Location.Y) + (ParentImage != null ? ParentImage.Y : 0);
+
     public void Move(double x = 0, double y = 0) {
         Location.X += x;
         Location.Y += y;
@@ -56,6 +61,8 @@ public abstract class Figure {
                 return new Circle();
         }
     }
+    
+    public abstract void Draw(Canvas canvas);
 }
 
 [Serializable]
@@ -106,6 +113,18 @@ public class Circle : Figure {
                $"{p}{p}  Scale = {Scale}\n" +
                $"{p}{p}  Radius = {Radius}";
     }
+    
+    public override void Draw(Canvas canvas) {
+        System.Windows.Shapes.Ellipse circle = new System.Windows.Shapes.Ellipse() {
+            Width = Scaled(Radius),
+            Height = Scaled(Radius),
+            Stroke = Brushes.Black,
+            StrokeThickness = 3
+        };
+        canvas.Children.Add(circle);
+        circle.SetValue(Canvas.LeftProperty, X);
+        circle.SetValue(Canvas.TopProperty, Y);
+    }
 }
 
 [Serializable]
@@ -131,6 +150,19 @@ public class FilledCircle : Circle {
                $"{p}{p}  Scale = {Scale}\n" +
                $"{p}{p}  Radius = {Radius}\n" +
                $"{p}{p}  Color = {Color}";
+    }
+    
+    public override void Draw(Canvas canvas) {
+        System.Windows.Shapes.Ellipse filledCircle = new System.Windows.Shapes.Ellipse() {
+            Width = Scaled(Radius),
+            Height = Scaled(Radius),
+            Stroke = Brushes.Black,
+            StrokeThickness = 3,
+            Fill = Brushes.Black
+        };
+        canvas.Children.Add(filledCircle);
+        filledCircle.SetValue(Canvas.LeftProperty, X);
+        filledCircle.SetValue(Canvas.TopProperty, Y);
     }
 }
 
@@ -168,6 +200,18 @@ public class Ellipse : Figure {
                $"{p}{p}  Width = {Width}\n" +
                $"{p}{p}  Height = {Height}";
     }
+    
+    public override void Draw(Canvas canvas) {
+        System.Windows.Shapes.Ellipse ellipse = new System.Windows.Shapes.Ellipse() {
+            Width = Scaled(Width),
+            Height = Scaled(Height),
+            Stroke = Brushes.Black,
+            StrokeThickness = 3
+        };
+        canvas.Children.Add(ellipse);
+        ellipse.SetValue(Canvas.LeftProperty, X);
+        ellipse.SetValue(Canvas.TopProperty, Y);
+    }
 }
 
 [Serializable]
@@ -177,7 +221,7 @@ public class Cone : Figure {
     
     public double Volume => Math.PI * Math.Pow(Scaled(Radius), 2) * Scaled(Height) / 3;
 
-    public Cone() : this(50, 10) {}
+    public Cone() : this(50, 100) {}
     
     public Cone(double radius, double height) {
         Radius = radius;
@@ -208,6 +252,26 @@ public class Cone : Figure {
                $"{p}{p}  Height = {Height}\n" +
                $"{p}{p}  Volume = {Volume}";
     }
+    
+    public override void Draw(Canvas canvas) {
+        Path triangle = new Path() {
+            Stroke = Brushes.Black,
+            StrokeThickness = 3,
+            Fill = Brushes.Black
+        };
+        StreamGeometry geometry = new StreamGeometry();
+        geometry.FillRule = FillRule.EvenOdd;
+        
+        using(StreamGeometryContext ctx = geometry.Open()) {
+            ctx.BeginFigure(new System.Windows.Point(X + Scaled(Radius), Y), true, true);
+            ctx.LineTo(new System.Windows.Point(X + Scaled(Radius) * 2, Y + Scaled(Height)), true, false);
+            ctx.LineTo(new System.Windows.Point(X, Y + Scaled(Height)), true, false);
+        }
+        geometry.Freeze();
+        triangle.Data = geometry;
+        
+        canvas.Children.Add(triangle);
+    }
 }
 
 [Serializable]
@@ -218,7 +282,7 @@ public class TruncatedCone : Figure {
         
     public double Volume => Math.PI * Scaled(Height) * (Math.Pow(Scaled(RadiusTop), 2) + Scaled(RadiusTop) * Scaled(RadiusBottom) + Math.Pow(Scaled(RadiusBottom), 2)) / 3;
 
-    public TruncatedCone() : this(50, 25, 10) {}
+    public TruncatedCone() : this(50, 25, 50) {}
 
     public TruncatedCone(double radiusBottom, double radiusTop, double height) {
         RadiusTop = radiusTop;
@@ -251,6 +315,27 @@ public class TruncatedCone : Figure {
                $"{p}{p}  RadiusBottom = {RadiusBottom}\n" +
                $"{p}{p}  Height = {Height}\n" +
                $"{p}{p}  Volume = {Volume}";
+    }
+
+    public override void Draw(Canvas canvas) {
+        Path trapeze = new Path() {
+            Stroke = Brushes.Black,
+            StrokeThickness = 3,
+            Fill = Brushes.Black
+        };
+        StreamGeometry geometry = new StreamGeometry();
+        geometry.FillRule = FillRule.EvenOdd;
+            
+        using(StreamGeometryContext ctx = geometry.Open()) {
+            ctx.BeginFigure(new System.Windows.Point(X + (Scaled(RadiusBottom) - Scaled(RadiusTop)), Y), true, true);
+            ctx.LineTo(new System.Windows.Point(X + (Scaled(RadiusBottom) - Scaled(RadiusTop)) + Scaled(RadiusTop) * 2, Y), true, false);
+            ctx.LineTo(new System.Windows.Point(X + Scaled(RadiusBottom) * 2, Y + Scaled(Height)), true, false);
+            ctx.LineTo(new System.Windows.Point(X, Y + Scaled(Height)), true, false);
+        }
+        geometry.Freeze();
+        trapeze.Data = geometry;
+            
+        canvas.Children.Add(trapeze);
     }
 }
 
