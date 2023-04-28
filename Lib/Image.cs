@@ -15,19 +15,7 @@ public class Image : Figure {
             if(Figures.Count == 0) return "";
             string result = "";
             foreach(Figure figure in Figures) {
-                result += $"{figure}, ";
-            }
-            result = result.Trim();
-            result = result.Remove(result.Length - 1, 1);
-            return result;
-        }
-    }
-    public string FiguresInfoString {
-        get {
-            if(Figures.Count == 0) return "";
-            string result = "";
-            foreach(Figure figure in Figures) {
-                result += "  "+figure.ToInfoString("  ") + "\n";
+                result += "  "+figure.ToString("  ") + "\n";
             }
             result = result.TrimEnd();
             return result;
@@ -102,13 +90,8 @@ public class Image : Figure {
         Figures.Add(figure);
         figure.ParentImage = this;
     }
-    
-    public override string ToString() {
-        return $"Image(Location = {Location}, Area = {GetArea()}, Perimeter = {GetPerimeter()}, " +
-               $"Scale = {Scale}, Figures = [{FiguresString}])";
-    }
-    
-    public override string ToInfoString(string p = "") {
+
+    public override string ToString(string p) {
         return $"Image: \n" + 
                $"  Location = {Location}\n" +
                $"  Area = {GetArea()}\n" +
@@ -116,7 +99,7 @@ public class Image : Figure {
                $"  Sum of areas = {GetAreas()}\n" +
                $"  Sum of perimeters = {GetPerimeters()}\n" +
                $"  Scale = {Scale}\n" +
-               $"  Figures = [\n{FiguresInfoString}\n  ]";
+               $"  Figures = [\n{FiguresString}\n  ]";
     }
     
     public override void Draw(Canvas cv) {}

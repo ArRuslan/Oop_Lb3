@@ -1,11 +1,16 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Windows;
 using Lib;
 
 namespace Lb3_Gui {
+    [SuppressMessage("ReSharper", "SuggestVarOrType_SimpleTypes")]
+    [SuppressMessage("ReSharper", "SuggestVarOrType_BuiltInTypes")]
+    [SuppressMessage("ReSharper", "ObjectCreationAsStatement")]
     public partial class MainWindow {
         private Image _mainImage;
-        private Figure _selectedFigure {
+        private Figure SelectedFigure {
             get {
                 string[] selItem = FiguresCb.Text.Split(' ');
                 if(selItem.Length < 2)
@@ -21,6 +26,7 @@ namespace Lb3_Gui {
             InitializeComponent();
             _mainImage = new Image(540, 464);
             FiguresCb.Items.Add("Image");
+            FiguresCb.Text = "Image";
         }
         
         private void _drawAll() {
@@ -30,43 +36,83 @@ namespace Lb3_Gui {
             }
         }
         
-        private void AddFigure_Btn_Click(Object sender, RoutedEventArgs e) {
+        private void AddFigure_Btn_Click(object sender, RoutedEventArgs e) {
             Figure figure = Figure.Get(NewFiguresCb.Text);
             _mainImage.AddFigure(figure);
             _drawAll();
             FiguresCb.Items.Add($"{_mainImage.Figures.IndexOf(figure)} {figure.GetType().Name}");
         }
         
-        private void FigureInfo_Btn_Click(Object sender, RoutedEventArgs e) {
-            MessageBox.Show(_selectedFigure.ToInfoString());
+        private void FigureInfo_Btn_Click(object sender, RoutedEventArgs e) {
+            MessageBox.Show(SelectedFigure.ToString());
         }
         
-        private void MoveTo_Btn_Click(Object sender, RoutedEventArgs e) {
-            _selectedFigure.MoveTo(double.Parse(TbMoveToX.Text), Double.Parse(TbMoveToY.Text));
+        private static double? ParseDouble(string str) {
+            double d;
+            try {
+                d = double.Parse(str.Replace(".", ","));
+            } catch (Exception) {
+                return null;
+            }
+            return d;
+        }
+            
+        private void MoveTo_Btn_Click(object sender, RoutedEventArgs e) {
+            double? x = ParseDouble(TbMoveToX.Text);
+            double? y = ParseDouble(TbMoveToY.Text);
+            if(x == null || y == null) return;
+            SelectedFigure.MoveTo((double)x, (double)y);
+            _drawAll();
+        }
+
+        private void Move_Btn_Click(object sender, RoutedEventArgs e) {
+            double? x = ParseDouble(TbMoveX.Text);
+            double? y = ParseDouble(TbMoveY.Text);
+            if(x == null || y == null) return;
+            SelectedFigure.Move((double)x, (double)y);
             _drawAll();
         }
         
-        private void Move_Btn_Click(Object sender, RoutedEventArgs e) {
-            _selectedFigure.Move(double.Parse(TbMoveX.Text), Double.Parse(TbMoveY.Text));
+        private void MoveAllTo_Btn_Click(object sender, RoutedEventArgs e) {
+            double? x = ParseDouble(TbMoveToX.Text);
+            double? y = ParseDouble(TbMoveToY.Text);
+            if(x == null || y == null) return;
+            _mainImage.MoveAllTo((double)x, (double)y);
             _drawAll();
         }
         
-        private void SetScale_Btn_Click(Object sender, RoutedEventArgs e) {
-            _selectedFigure.Scale = double.Parse(TbScale.Text);
+        private void MoveAll_Btn_Click(object sender, RoutedEventArgs e) {
+            double? x = ParseDouble(TbMoveX.Text);
+            double? y = ParseDouble(TbMoveY.Text);
+            if(x == null || y == null) return;
+            _mainImage.MoveAll((double)x, (double)y);
             _drawAll();
         }
         
-        private void SaveImage_Btn_Click(Object sender, RoutedEventArgs e) {
+        private void SetScale_Btn_Click(object sender, RoutedEventArgs e) {
+            double? scale = ParseDouble(TbMoveX.Text);
+            if(scale == null) return;
+            SelectedFigure.Scale = (double)scale;
+            _drawAll();
+        }
+        
+        private void SaveImage_Btn_Click(object sender, RoutedEventArgs e) {
+            TbImagePath.Text = TbImagePath.Text.Trim();
+            try { new FileInfo(TbImagePath.Text); } catch(Exception) { return; }
             _mainImage.SaveToFile(TbImagePath.Text);
             _drawAll();
         }
         
-        private void LoadImage_Btn_Click(Object sender, RoutedEventArgs e) {
+        private void LoadImage_Btn_Click(object sender, RoutedEventArgs e) {
+            TbImagePath.Text = TbImagePath.Text.Trim();
+            try { new FileInfo(TbImagePath.Text); } catch(Exception) { return; }
             _mainImage = Image.LoadFromFile(TbImagePath.Text);
             _drawAll();
         }
         
-        private void MergeImage_Btn_Click(Object sender, RoutedEventArgs e) {
+        private void MergeImage_Btn_Click(object sender, RoutedEventArgs e) {
+            TbImagePath.Text = TbImagePath.Text.Trim();
+            try { new FileInfo(TbImagePath.Text); } catch(Exception) { return; }
             Image otherImage = Image.LoadFromFile(TbImagePath.Text);
             _mainImage.Merge(otherImage);
             _drawAll();

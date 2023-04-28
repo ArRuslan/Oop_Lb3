@@ -3,7 +3,6 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:Lb3_Gui"
         mc:Ignorable="d"
         Title="Lb3-GUI" Height="500" Width="740" MinHeight="500" MinWidth="740" MaxHeight="500" MaxWidth="740">
     <Grid>
@@ -22,12 +21,14 @@
         <TextBox HorizontalAlignment="Left" Margin="573,153,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="137" Name="TbMoveToY"/>
         <Label Content="X:" HorizontalAlignment="Left" Margin="555,126,0,0" VerticalAlignment="Top" Height="23"/>
         <Label Content="Y:" HorizontalAlignment="Left" Margin="555,147,0,0" VerticalAlignment="Top" Height="23"/>
-        <Button Content="Move To" HorizontalAlignment="Left" Margin="555,176,0,0" VerticalAlignment="Top" Width="155" Click="MoveTo_Btn_Click"/>
+        <Button Content="Move To" HorizontalAlignment="Left" Margin="555,176,0,0" VerticalAlignment="Top" Width="75" Click="MoveTo_Btn_Click"/>
+        <Button Content="Move All To" HorizontalAlignment="Left" Margin="635,176,0,0" VerticalAlignment="Top" Width="75" Click="MoveAllTo_Btn_Click"/>
         <TextBox HorizontalAlignment="Left" Margin="573,208,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="137" Name="TbMoveX"/>
         <TextBox HorizontalAlignment="Left" Margin="573,231,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="137" Name="TbMoveY"/>
         <Label Content="X:" HorizontalAlignment="Left" Margin="555,204,0,0" VerticalAlignment="Top" Height="23"/>
         <Label Content="Y:" HorizontalAlignment="Left" Margin="555,225,0,0" VerticalAlignment="Top" Height="23"/>
-        <Button Content="Move" HorizontalAlignment="Left" Margin="555,254,0,0" VerticalAlignment="Top" Width="155"  Click="Move_Btn_Click"/>
+        <Button Content="Move" HorizontalAlignment="Left" Margin="555,254,0,0" VerticalAlignment="Top" Width="75"  Click="Move_Btn_Click"/>
+        <Button Content="Move All" HorizontalAlignment="Left" Margin="635,254,0,0" VerticalAlignment="Top" Width="75"  Click="MoveAll_Btn_Click"/>
         <Button Content="Merge Image" HorizontalAlignment="Left" Margin="555,435,0,0" VerticalAlignment="Top" Width="155" Click="MergeImage_Btn_Click"/>
         <Button Content="Load Image" HorizontalAlignment="Left" Margin="555,410,0,0" VerticalAlignment="Top" Width="155" Click="LoadImage_Btn_Click"/>
         <Button Content="Save Image" HorizontalAlignment="Left" Margin="555,385,0,0" VerticalAlignment="Top" Width="155" Click="SaveImage_Btn_Click"/>

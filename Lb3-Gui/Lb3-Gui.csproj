@@ -5,7 +5,8 @@
         <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
         <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
         <ProjectGuid>{D5B8C325-F70B-4890-9264-62F4C5035200}</ProjectGuid>
-        <OutputType>WinExe</OutputType>
+        <OutputType>Exe</OutputType>
+        <DisableWinExeOutputInference>true</DisableWinExeOutputInference>
         <RootNamespace>Lb3_Gui</RootNamespace>
         <AssemblyName>Lb3_Gui</AssemblyName>
         <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>

@@ -2,15 +2,17 @@
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
+// ReSharper disable SuggestVarOrType_SimpleTypes
+// ReSharper disable SuggestVarOrType_BuiltInTypes
 
 namespace Lib {
 [Serializable]
 public abstract class Figure {
     public Point Location = new Point();
-    public Image ParentImage { get; set; } = null;
+    public Image ParentImage { get; set; }
     public double Scale { get; set; } = 1;
-    public double X => Scaled(Location.X) + (ParentImage != null ? ParentImage.X : 0);
-    public double Y => Scaled(Location.Y) + (ParentImage != null ? ParentImage.Y : 0);
+    public double X => Scaled(Location.X) + (ParentImage?.X ?? 0);
+    public double Y => Scaled(Location.Y) + (ParentImage?.Y ?? 0);
 
     public void Move(double x = 0, double y = 0) {
         Location.X += x;
@@ -29,15 +31,14 @@ public abstract class Figure {
     }
 
     public virtual double Scaled(double val) {
-        return Scale * val * (ParentImage != null ? ParentImage.Scale : 1);
+        return Scale * val * (ParentImage?.Scale ?? 1);
     }
     
     public override string ToString() {
-        return $"{GetType().Name}(Location = {Location}, Area = {GetArea()}, Perimeter = {GetPerimeter()}, " +
-               $"Scale = {Scale})";
+        return ToString("");
     }
     
-    public virtual string ToInfoString(string p = "") {
+    public virtual string ToString(string p) {
         return $"{p}{GetType().Name}:\n" +
                $"{p}{p}  Location = {Location}\n" +
                $"{p}{p}  Area = {GetArea()}\n" +
@@ -99,13 +100,8 @@ public class Circle : Figure {
     public override double GetPerimeter() {
         return 2 * Math.PI * Scaled(Radius);
     }
-    
-    public override string ToString() {
-        return $"Circle(Location = {Location}, Area = {GetArea()}, Perimeter = {GetPerimeter()}, " +
-               $"Scale = {Scale}, Radius = {Radius})";
-    }
-    
-    public override string ToInfoString(string p = "") {
+
+    public override string ToString(string p) {
         return $"{p}Circle:\n" +
                $"{p}{p}  Location = {Location}\n" +
                $"{p}{p}  Area = {GetArea()}\n" +
@@ -129,27 +125,13 @@ public class Circle : Figure {
 
 [Serializable]
 public class FilledCircle : Circle {
-    public FilledCircle() : this(0) {}
-    
-    public FilledCircle(long color) {
-        Color = color;
-    }
-
-    public long Color { get; set; }
-    
-    public override string ToString() {
-        return $"FilledCircle(Location = {Location}, Area = {GetArea()}, Perimeter = {GetPerimeter()}, " +
-               $"Scale = {Scale}, Radius = {Radius}, Color = {Color})";
-    }
-    
-    public override string ToInfoString(string p = "") {
+    public override string ToString(string p) {
         return $"{p}FilledCircle:\n" +
                $"{p}{p}  Location = {Location}\n" +
                $"{p}{p}  Area = {GetArea()}\n" +
                $"{p}{p}  Perimeter = {GetPerimeter()}\n" +
                $"{p}{p}  Scale = {Scale}\n" +
-               $"{p}{p}  Radius = {Radius}\n" +
-               $"{p}{p}  Color = {Color}";
+               $"{p}{p}  Radius = {Radius}\n";
     }
     
     public override void Draw(Canvas canvas) {
@@ -185,13 +167,8 @@ public class Ellipse : Figure {
     public override double GetPerimeter() {
         return Math.PI * Math.Sqrt(Math.Pow(Scaled(Width), 2) + Math.Pow(Scaled(Height), 2));
     }
-    
-    public override string ToString() {
-        return $"Ellipse(Location = {Location}, Area = {GetArea()}, Perimeter = {GetPerimeter()}, " +
-               $"Scale = {Scale}, Width = {Width}, Height = {Height})";
-    }
-    
-    public override string ToInfoString(string p = "") {
+
+    public override string ToString(string p) {
         return $"{p}Ellipse:\n" +
                $"{p}{p}  Location = {Location}\n" +
                $"{p}{p}  Area = {GetArea()}\n" +
@@ -236,13 +213,8 @@ public class Cone : Figure {
         double c = Math.Sqrt(Math.Pow(Scaled(Radius), 2) + Math.Pow(Scaled(Height), 2)); // Сторона трикутника (проекції)
         return Scaled(Radius) + 2 * c;
     }
-    
-    public override string ToString() {
-        return $"Cone(Location = {Location}, ProjectionArea = {GetArea()}, ProjectionPerimeter = {GetPerimeter()}, " +
-               $"Scale = {Scale}, Radius = {Radius}, Height = {Height}, Volume = {Volume})";
-    }
-    
-    public override string ToInfoString(string p = "") {
+
+    public override string ToString(string p) {
         return $"{p}Cone:\n" +
                $"{p}{p}  Location = {Location}\n" +
                $"{p}{p}  Area = {GetArea()}\n" +
@@ -259,9 +231,10 @@ public class Cone : Figure {
             StrokeThickness = 3,
             Fill = Brushes.Black
         };
-        StreamGeometry geometry = new StreamGeometry();
-        geometry.FillRule = FillRule.EvenOdd;
-        
+        StreamGeometry geometry = new StreamGeometry {
+            FillRule = FillRule.EvenOdd
+        };
+
         using(StreamGeometryContext ctx = geometry.Open()) {
             ctx.BeginFigure(new System.Windows.Point(X + Scaled(Radius), Y), true, true);
             ctx.LineTo(new System.Windows.Point(X + Scaled(Radius) * 2, Y + Scaled(Height)), true, false);
@@ -298,14 +271,8 @@ public class TruncatedCone : Figure {
         double c = Math.Sqrt(Math.Pow(Scaled(RadiusBottom) - Scaled(RadiusTop), 2) + Math.Pow(Scaled(Height), 2)); // Сторона трапеції (проекції)
         return Scaled(RadiusTop) * 2 + Scaled(RadiusBottom) * 2 + 2 * c;
     }
-    
-    public override string ToString() {
-        return $"TruncatedCone(Location = {Location}, ProjectionArea = {GetArea()}, " +
-               $"ProjectionPerimeter = {GetPerimeter()}, Scale = {Scale}, RadiusTop = {RadiusTop}, " +
-               $"RadiusBottom = {RadiusBottom}, Height = {Height}, Volume = {Volume})";
-    }
-    
-    public override string ToInfoString(string p = "") {
+
+    public override string ToString(string p) {
         return $"{p}TruncatedCone:\n" +
                $"{p}{p}  Location = {Location}\n" +
                $"{p}{p}  ProjectionArea = {GetArea()}\n" +
@@ -323,9 +290,10 @@ public class TruncatedCone : Figure {
             StrokeThickness = 3,
             Fill = Brushes.Black
         };
-        StreamGeometry geometry = new StreamGeometry();
-        geometry.FillRule = FillRule.EvenOdd;
-            
+        StreamGeometry geometry = new StreamGeometry {
+            FillRule = FillRule.EvenOdd
+        };
+
         using(StreamGeometryContext ctx = geometry.Open()) {
             ctx.BeginFigure(new System.Windows.Point(X + (Scaled(RadiusBottom) - Scaled(RadiusTop)), Y), true, true);
             ctx.LineTo(new System.Windows.Point(X + (Scaled(RadiusBottom) - Scaled(RadiusTop)) + Scaled(RadiusTop) * 2, Y), true, false);
