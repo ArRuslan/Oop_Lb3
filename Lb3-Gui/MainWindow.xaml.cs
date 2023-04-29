@@ -90,7 +90,7 @@ namespace Lb3_Gui {
         }
         
         private void SetScale_Btn_Click(object sender, RoutedEventArgs e) {
-            double? scale = ParseDouble(TbMoveX.Text);
+            double? scale = ParseDouble(TbScale.Text);
             if(scale == null) return;
             SelectedFigure.Scale = (double)scale;
             _drawAll();
