@@ -31,9 +31,7 @@ namespace Lb3_Gui {
         
         private void _drawAll() {
             MainCanvas.Children.Clear();
-            foreach (Figure figure in _mainImage.Figures) {
-                figure.Draw(MainCanvas);
-            }
+            _mainImage.Draw(MainCanvas);
         }
         
         private void AddFigure_Btn_Click(object sender, RoutedEventArgs e) {
@@ -60,7 +58,10 @@ namespace Lb3_Gui {
         private void MoveTo_Btn_Click(object sender, RoutedEventArgs e) {
             double? x = ParseDouble(TbMoveToX.Text);
             double? y = ParseDouble(TbMoveToY.Text);
-            if(x == null || y == null) return;
+            if(x == null || y == null) {
+                MessageBox.Show("Введені значення не є корректними числами.");
+                return;
+            }
             SelectedFigure.MoveTo((double)x, (double)y);
             _drawAll();
         }
@@ -68,7 +69,10 @@ namespace Lb3_Gui {
         private void Move_Btn_Click(object sender, RoutedEventArgs e) {
             double? x = ParseDouble(TbMoveX.Text);
             double? y = ParseDouble(TbMoveY.Text);
-            if(x == null || y == null) return;
+            if(x == null || y == null) {
+                MessageBox.Show("Введені значення не є корректними числами.");
+                return;
+            }
             SelectedFigure.Move((double)x, (double)y);
             _drawAll();
         }
@@ -76,7 +80,10 @@ namespace Lb3_Gui {
         private void MoveAllTo_Btn_Click(object sender, RoutedEventArgs e) {
             double? x = ParseDouble(TbMoveToX.Text);
             double? y = ParseDouble(TbMoveToY.Text);
-            if(x == null || y == null) return;
+            if(x == null || y == null) {
+                MessageBox.Show("Введені значення не є корректними числами.");
+                return;
+            }
             _mainImage.MoveAllTo((double)x, (double)y);
             _drawAll();
         }
@@ -84,14 +91,20 @@ namespace Lb3_Gui {
         private void MoveAll_Btn_Click(object sender, RoutedEventArgs e) {
             double? x = ParseDouble(TbMoveX.Text);
             double? y = ParseDouble(TbMoveY.Text);
-            if(x == null || y == null) return;
+            if(x == null || y == null) {
+                MessageBox.Show("Введені значення не є корректними числами.");
+                return;
+            }
             _mainImage.MoveAll((double)x, (double)y);
             _drawAll();
         }
         
         private void SetScale_Btn_Click(object sender, RoutedEventArgs e) {
             double? scale = ParseDouble(TbScale.Text);
-            if(scale == null) return;
+            if(scale == null || scale < 0) {
+                MessageBox.Show("Введене значення масштабу не є корректним числом.");
+                return;
+            }
             SelectedFigure.Scale = (double)scale;
             _drawAll();
         }
@@ -106,14 +119,21 @@ namespace Lb3_Gui {
         private void LoadImage_Btn_Click(object sender, RoutedEventArgs e) {
             TbImagePath.Text = TbImagePath.Text.Trim();
             try { new FileInfo(TbImagePath.Text); } catch(Exception) { return; }
-            _mainImage = Image.LoadFromFile(TbImagePath.Text);
+            try { _mainImage = Image.LoadFromFile(TbImagePath.Text); } catch(Exception) { return; }
             _drawAll();
+            FiguresCb.Items.Clear();
+            FiguresCb.Items.Add("Image");
+            FiguresCb.Text = "Image";
+            foreach(Figure figure in _mainImage.Figures) {
+                FiguresCb.Items.Add($"{_mainImage.Figures.IndexOf(figure)} {figure.GetType().Name}");
+            }
         }
         
         private void MergeImage_Btn_Click(object sender, RoutedEventArgs e) {
             TbImagePath.Text = TbImagePath.Text.Trim();
             try { new FileInfo(TbImagePath.Text); } catch(Exception) { return; }
-            Image otherImage = Image.LoadFromFile(TbImagePath.Text);
+            Image otherImage;
+            try { otherImage = Image.LoadFromFile(TbImagePath.Text); } catch(Exception) { return; }
             _mainImage.Merge(otherImage);
             _drawAll();
             foreach(Figure figure in otherImage.Figures) {

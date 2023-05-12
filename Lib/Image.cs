@@ -45,6 +45,17 @@ public class Image : Figure {
         return result;
     }
 
+    public double GetAreasWithIntersections() {
+        double result = 0;
+        foreach(Figure figure1 in Figures) {
+            foreach(Figure figure2 in Figures) {
+                if(figure1 == figure2) continue;
+                result += figure1.GetIntersectionArea(figure2);
+            }
+        }
+        return result;
+    }
+
     public double GetPerimeters() {
         double result = 0;
         foreach(Figure figure in Figures) {
@@ -92,6 +103,8 @@ public class Image : Figure {
     }
 
     public override string ToString(string p) {
+        Console.WriteLine(GetAreasWithIntersections());
+        
         return $"Image: \n" + 
                $"  Location = {Location}\n" +
                $"  Area = {GetArea()}\n" +
@@ -102,6 +115,12 @@ public class Image : Figure {
                $"  Figures = [\n{FiguresString}\n  ]";
     }
     
-    public override void Draw(Canvas cv) {}
+    public override void Draw(Canvas cv) {
+        foreach (Figure figure in Figures) {
+            figure.Draw(cv);
+        }
+    }
+    
+    public override double GetIntersectionArea(Figure figure) => 0;
 }
 }

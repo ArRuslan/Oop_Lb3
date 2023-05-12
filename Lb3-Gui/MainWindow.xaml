@@ -33,7 +33,7 @@
         <Button Content="Load Image" HorizontalAlignment="Left" Margin="555,410,0,0" VerticalAlignment="Top" Width="155" Click="LoadImage_Btn_Click"/>
         <Button Content="Save Image" HorizontalAlignment="Left" Margin="555,385,0,0" VerticalAlignment="Top" Width="155" Click="SaveImage_Btn_Click"/>
         <TextBox HorizontalAlignment="Left" Margin="555,362,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="155" Name="TbImagePath"/>
-        <Label Content="Path:" HorizontalAlignment="Left" Margin="550,341,0,0" VerticalAlignment="Top"/>
+        <Label Content="Path / Name:" HorizontalAlignment="Left" Margin="550,341,0,0" VerticalAlignment="Top"/>
         <Button Content="Figure Info" HorizontalAlignment="Left" Margin="555,279,0,0" VerticalAlignment="Top" Width="155" Click="FigureInfo_Btn_Click"/>
         <TextBox HorizontalAlignment="Left" Margin="573,301,0,0" TextWrapping="Wrap" Text="1" VerticalAlignment="Top" Width="137" Name="TbScale"/>
         <Label Content="S:" HorizontalAlignment="Left" Margin="555,297,0,0" VerticalAlignment="Top" Height="23"/>

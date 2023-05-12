@@ -11,8 +11,8 @@ public abstract class Figure {
     public Point Location = new Point();
     public Image ParentImage { get; set; }
     public double Scale { get; set; } = 1;
-    public double X => Scaled(Location.X) + (ParentImage?.X ?? 0);
-    public double Y => Scaled(Location.Y) + (ParentImage?.Y ?? 0);
+    public double X => (ParentImage?.Scale ?? 1) * (ParentImage?.Location.X ?? 0) + Location.X * (ParentImage?.Scale ?? 1);
+    public double Y => (ParentImage?.Scale ?? 1) * (ParentImage?.Location.Y ?? 0) + Location.Y * (ParentImage?.Scale ?? 1);
 
     public void Move(double x = 0, double y = 0) {
         Location.X += x;
@@ -64,6 +64,8 @@ public abstract class Figure {
     }
     
     public abstract void Draw(Canvas canvas);
+    
+    public abstract double GetIntersectionArea(Figure figure);
 }
 
 [Serializable]
@@ -85,13 +87,14 @@ public class Point {
 
 [Serializable]
 public class Circle : Figure {
-    public Circle() : this(50) {}
+    public Circle() : this(25) {}
 
     public Circle(double radius) {
         Radius = radius;
     }
     
     public double Radius { get; set; }
+    public Point Center => new Point(X + Scaled(Radius), Y + Scaled(Radius));
     
     public override double GetArea() {
         return Math.PI * Scaled(Radius) * Scaled(Radius);
@@ -112,14 +115,27 @@ public class Circle : Figure {
     
     public override void Draw(Canvas canvas) {
         System.Windows.Shapes.Ellipse circle = new System.Windows.Shapes.Ellipse() {
-            Width = Scaled(Radius),
-            Height = Scaled(Radius),
+            Width = Scaled(Radius)*2,
+            Height = Scaled(Radius)*2,
             Stroke = Brushes.Black,
             StrokeThickness = 3
         };
         canvas.Children.Add(circle);
         circle.SetValue(Canvas.LeftProperty, X);
         circle.SetValue(Canvas.TopProperty, Y);
+    }
+    
+    public override double GetIntersectionArea(Figure figure) {
+        if(figure is Circle) 
+            return CalculateIntersectionArea.Circle_Circle(this, (Circle)figure);
+        if(figure is Ellipse) 
+            return CalculateIntersectionArea.Circle_Ellipse(this, (Ellipse)figure);
+        if(figure is Cone) 
+            return CalculateIntersectionArea.Circle_Triangle(this, (Cone)figure);
+        if(figure is TruncatedCone) 
+            return CalculateIntersectionArea.Circle_Trapeze(this, (TruncatedCone)figure);
+        
+        return 0;
     }
 }
 
@@ -131,7 +147,7 @@ public class FilledCircle : Circle {
                $"{p}{p}  Area = {GetArea()}\n" +
                $"{p}{p}  Perimeter = {GetPerimeter()}\n" +
                $"{p}{p}  Scale = {Scale}\n" +
-               $"{p}{p}  Radius = {Radius}\n";
+               $"{p}{p}  Radius = {Radius}";
     }
     
     public override void Draw(Canvas canvas) {
@@ -159,9 +175,10 @@ public class Ellipse : Figure {
     
     public double Width { get; set; }
     public double Height { get; set; }
+    public Point Center => new Point(X + Scaled(Width)/2, Y + Scaled(Height)/2);
     
     public override double GetArea() {
-        return Math.PI * Scaled(Width) * Scaled(Height);
+        return Math.PI * Scaled(Width/2) * Scaled(Height/2);
     }
 
     public override double GetPerimeter() {
@@ -189,14 +206,36 @@ public class Ellipse : Figure {
         ellipse.SetValue(Canvas.LeftProperty, X);
         ellipse.SetValue(Canvas.TopProperty, Y);
     }
+    
+    public override double GetIntersectionArea(Figure figure) {
+        if(figure is Circle) 
+            return CalculateIntersectionArea.Circle_Ellipse((Circle)figure, this);
+        if(figure is Ellipse) 
+            return CalculateIntersectionArea.Ellipse_Ellipse(this, (Ellipse)figure);
+        if(figure is Cone) 
+            return CalculateIntersectionArea.Ellipse_Triangle(this, (Cone)figure);
+        if(figure is TruncatedCone) 
+            return CalculateIntersectionArea.Ellipse_Trapeze(this, (TruncatedCone)figure);
+            
+        return 0;
+    }
+}
+
+public interface FigureWithPoints {
+    Point[] Points { get; }
 }
 
 [Serializable]
-public class Cone : Figure {
+public class Cone : Figure, FigureWithPoints {
     public double Radius { get; set; }
     public double Height { get; set; }
     
     public double Volume => Math.PI * Math.Pow(Scaled(Radius), 2) * Scaled(Height) / 3;
+    public Point[] Points => new [] {
+        new Point(X + Scaled(Radius), Y),
+        new Point(X, Y + Scaled(Height)),
+        new Point(X + Scaled(Radius) * 2, Y + Scaled(Height)),
+    };
 
     public Cone() : this(50, 100) {}
     
@@ -234,26 +273,47 @@ public class Cone : Figure {
         StreamGeometry geometry = new StreamGeometry {
             FillRule = FillRule.EvenOdd
         };
+        
+        Point[] points = Points;
 
         using(StreamGeometryContext ctx = geometry.Open()) {
-            ctx.BeginFigure(new System.Windows.Point(X + Scaled(Radius), Y), true, true);
-            ctx.LineTo(new System.Windows.Point(X + Scaled(Radius) * 2, Y + Scaled(Height)), true, false);
-            ctx.LineTo(new System.Windows.Point(X, Y + Scaled(Height)), true, false);
+            ctx.BeginFigure(new System.Windows.Point(points[0].X, points[0].Y), true, true);
+            ctx.LineTo(new System.Windows.Point(points[1].X, points[1].Y), true, false);
+            ctx.LineTo(new System.Windows.Point(points[2].X, points[2].Y), true, false);
         }
         geometry.Freeze();
         triangle.Data = geometry;
         
         canvas.Children.Add(triangle);
     }
+    
+    public override double GetIntersectionArea(Figure figure) {
+        if(figure is Circle) 
+            return CalculateIntersectionArea.Circle_Triangle((Circle)figure, this);
+        if(figure is Ellipse) 
+            return CalculateIntersectionArea.Ellipse_Triangle((Ellipse)figure, this);
+        if(figure is Cone) 
+            return CalculateIntersectionArea.Triangle_Triangle(this, (Cone)figure);
+        if(figure is TruncatedCone) 
+            return CalculateIntersectionArea.Triangle_Trapeze(this, (TruncatedCone)figure);
+                
+        return 0;
+    }
 }
 
 [Serializable]
-public class TruncatedCone : Figure {
+public class TruncatedCone : Figure, FigureWithPoints {
     public double RadiusTop { get; set; }
     public double RadiusBottom { get; set; }
     public double Height { get; set; }
         
     public double Volume => Math.PI * Scaled(Height) * (Math.Pow(Scaled(RadiusTop), 2) + Scaled(RadiusTop) * Scaled(RadiusBottom) + Math.Pow(Scaled(RadiusBottom), 2)) / 3;
+    public Point[] Points => new [] {
+        new Point(X + (Scaled(RadiusBottom) - Scaled(RadiusTop)), Y),
+        new Point(X + (Scaled(RadiusBottom) - Scaled(RadiusTop)) + Scaled(RadiusTop) * 2, Y),
+        new Point(X + Scaled(RadiusBottom) * 2, Y + Scaled(Height)),
+        new Point(X, Y + Scaled(Height)),
+    };
 
     public TruncatedCone() : this(50, 25, 50) {}
 
@@ -294,16 +354,31 @@ public class TruncatedCone : Figure {
             FillRule = FillRule.EvenOdd
         };
 
+        Point[] points = Points;
+
         using(StreamGeometryContext ctx = geometry.Open()) {
-            ctx.BeginFigure(new System.Windows.Point(X + (Scaled(RadiusBottom) - Scaled(RadiusTop)), Y), true, true);
-            ctx.LineTo(new System.Windows.Point(X + (Scaled(RadiusBottom) - Scaled(RadiusTop)) + Scaled(RadiusTop) * 2, Y), true, false);
-            ctx.LineTo(new System.Windows.Point(X + Scaled(RadiusBottom) * 2, Y + Scaled(Height)), true, false);
-            ctx.LineTo(new System.Windows.Point(X, Y + Scaled(Height)), true, false);
+            ctx.BeginFigure(new System.Windows.Point(points[0].X, points[0].Y), true, true);
+            ctx.LineTo(new System.Windows.Point(points[1].X, points[1].Y), true, false);
+            ctx.LineTo(new System.Windows.Point(points[2].X, points[2].Y), true, false);
+            ctx.LineTo(new System.Windows.Point(points[3].X, points[3].Y), true, false);
         }
         geometry.Freeze();
         trapeze.Data = geometry;
             
         canvas.Children.Add(trapeze);
+    }
+    
+    public override double GetIntersectionArea(Figure figure) {
+        if(figure is Circle) 
+            return CalculateIntersectionArea.Circle_Trapeze((Circle)figure, this);
+        if(figure is Ellipse) 
+            return CalculateIntersectionArea.Ellipse_Trapeze((Ellipse)figure, this);
+        if(figure is Cone) 
+            return CalculateIntersectionArea.Triangle_Trapeze((Cone)figure, this);
+        if(figure is TruncatedCone) 
+            return CalculateIntersectionArea.Trapeze_Trapeze(this, (TruncatedCone)figure);
+                    
+        return 0;
     }
 }
 
