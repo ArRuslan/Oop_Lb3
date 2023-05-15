@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
@@ -223,6 +224,23 @@ public class Ellipse : Figure {
 
 public interface FigureWithPoints {
     Point[] Points { get; }
+}
+
+public class EllipseWithPoints : FigureWithPoints {
+    private Point[] _points;
+    public Point[] Points => _points;
+    private const int NUMBER_OF_POINTS = 100;
+    
+    public EllipseWithPoints(Ellipse ellipse) {
+        List<Point> points = new List<Point>();
+        double step = 2 * Math.PI / NUMBER_OF_POINTS;
+        for (double theta = 0; theta < 2 * Math.PI; theta += step) {
+            double x = ellipse.Center.X + ellipse.Scaled(ellipse.Width/2) * Math.Cos(theta);
+            double y = ellipse.Center.Y + ellipse.Scaled(ellipse.Height/2) * Math.Sin(theta);
+            points.Add(new Point(x, y));
+        }
+        _points = points.ToArray();
+    }
 }
 
 [Serializable]

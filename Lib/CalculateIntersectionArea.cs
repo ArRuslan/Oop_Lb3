@@ -159,6 +159,8 @@ public static class CalculateIntersectionArea {
     }
 
     public static double Ellipse_Ellipse(Ellipse ellipse1, Ellipse ellipse2) {
+        return AreaOfIntersectionOfPolygons(new EllipseWithPoints(ellipse1), new EllipseWithPoints(ellipse2));
+        
         double left = Math.Min(ellipse1.X, ellipse2.X);
         double right = Math.Max(ellipse1.X+ellipse1.Scaled(ellipse1.Width), ellipse2.X+ellipse2.Scaled(ellipse2.Width));
         double top = Math.Min(ellipse1.Y, ellipse2.Y);
@@ -184,11 +186,11 @@ public static class CalculateIntersectionArea {
     }
 
     public static double Ellipse_Triangle(Ellipse ellipse, Cone cone) {
-        return 0;
+        return AreaOfIntersectionOfPolygons(new EllipseWithPoints(ellipse), cone);
     }
 
     public static double Ellipse_Trapeze(Ellipse ellipse, TruncatedCone truncatedCone) {
-        return 0;
+        return AreaOfIntersectionOfPolygons(new EllipseWithPoints(ellipse), truncatedCone);
     }
     
     private static bool IsInside(Point cEdgeStart, Point cEdgeEnd, Point sEdge) {
@@ -221,9 +223,6 @@ public static class CalculateIntersectionArea {
     
     // Sutherland-Hodgman algorithm: http://en.wikipedia.org/wiki/Sutherland%E2%80%93Hodgman_algorithm
     private static Point[] ClipPolygon(FigureWithPoints subjectPolygon, FigureWithPoints clippingPolygon) {
-        if(!(subjectPolygon is Cone) && !(subjectPolygon is TruncatedCone)) return new Point[0];
-        if(!(clippingPolygon is Cone) && !(clippingPolygon is TruncatedCone)) return new Point[0];
-        
         Point[] clippingPolygonPoints = clippingPolygon.Points;
         
         List<Point> finalPolygon = new List<Point>(subjectPolygon.Points);
@@ -251,17 +250,17 @@ public static class CalculateIntersectionArea {
             }
         }
         
-        return finalPolygon.ToArray();
+        return finalPolygon.Where(point => !Double.IsNaN(point.X) && !Double.IsNaN(point.Y)).ToArray();
     }
-    
+
     // Area of a convex polygon: http://www.mathwords.com/a/area_convex_polygon.htm
     private static double AreaOfIntersectionOfPolygons(FigureWithPoints polygon1, FigureWithPoints polygon2) {
         Point[] intersectionPoints = ClipPolygon(polygon1, polygon2);
         if(intersectionPoints.Length < 3) return 0;
         double result = 0;
         for(int i = 0; i < intersectionPoints.Length; i++) {
-            result += intersectionPoints[i].X * intersectionPoints[i == intersectionPoints.Length - 1 ? 0 : i + 1].Y;
-            result -= intersectionPoints[i].Y * intersectionPoints[i == intersectionPoints.Length - 1 ? 0 : i + 1].X;
+            result += intersectionPoints[i].X * intersectionPoints[i == intersectionPoints.Length - 1 ? 0 : i + 1].Y - 
+                      intersectionPoints[i].Y * intersectionPoints[i == intersectionPoints.Length - 1 ? 0 : i + 1].X;
         }
         return result/2;
     }
