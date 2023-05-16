@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Documents;
+using Clipper2Lib;
 
 namespace Lib {
 public static class CalculateIntersectionArea {
     public static double Circle_Circle(Circle circle1, Circle circle2) {
-        double radius1 = circle1.Scaled(circle1.Radius);
+        return AreaOfIntersectionOfPolygons(new CircleWithPoints(circle1), new CircleWithPoints(circle2));
+    
+        /*double radius1 = circle1.Scaled(circle1.Radius);
         double radius2 = circle2.Scaled(circle2.Radius);
 
         Point centersVector = new Point(circle2.Center.X-circle1.Center.X, circle2.Center.Y-circle1.Center.Y);
@@ -20,11 +24,13 @@ public static class CalculateIntersectionArea {
         double area1 = 0.5 * Math.Pow(radius1, 2) * (alpha - Math.Sin(alpha));
         double area2 = 0.5 * Math.Pow(radius2, 2) * (alpha - Math.Sin(alpha));
         
-        return area1 + area2;
+        return area1 + area2;*/
     }
 
     public static double Circle_Ellipse(Circle circle, Ellipse ellipse) {
-        double ex = ellipse.Center.X - circle.Center.X;
+        return AreaOfIntersectionOfPolygons(new CircleWithPoints(circle), new EllipseWithPoints(ellipse));
+    
+        /*double ex = ellipse.Center.X - circle.Center.X;
         double ey = ellipse.Center.Y - circle.Center.Y;
     
         double a = Math.Pow(ellipse.Width / 2, 2);
@@ -66,10 +72,10 @@ public static class CalculateIntersectionArea {
             }
         }
     
-        return intersectionArea;
+        return intersectionArea;*/
     }
 
-    private static double SignedArea(Point[] polygonVertices) {
+    /*private static double SignedArea(Point[] polygonVertices) {
         double area = 0;
 
         for (int i = 0; i < polygonVertices.Length; i++) {
@@ -140,28 +146,30 @@ public static class CalculateIntersectionArea {
         double cross = dx1 * dy2 - dx2 * dy1;
 
         return Math.Atan2(cross, dot);
-    }
+    }*/
     
     public static double Circle_Triangle(Circle circle, Cone cone) {
-        return AreaOfIntersectionOfCircleWithPolygon(circle, cone.Points);
+        return AreaOfIntersectionOfPolygons(new CircleWithPoints(circle), cone);
+        //return AreaOfIntersectionOfCircleWithPolygon(circle, cone.Points);
     }
 
     public static double Circle_Trapeze(Circle circle, TruncatedCone truncatedCone) {
-        return AreaOfIntersectionOfCircleWithPolygon(circle, truncatedCone.Points);
+        return AreaOfIntersectionOfPolygons(new CircleWithPoints(circle), truncatedCone);
+        //return AreaOfIntersectionOfCircleWithPolygon(circle, truncatedCone.Points);
     }
     
-    private static bool IsInsideEllipse(double x, double y, Ellipse ellipse) {
+    /*private static bool IsInsideEllipse(double x, double y, Ellipse ellipse) {
         double a = ellipse.Width / 2;
         double b = ellipse.Height / 2;
         double dx = x - ellipse.Center.X;
         double dy = y - ellipse.Center.Y;
         return dx * dx / (a * a) + dy * dy / (b * b) <= 1;
-    }
+    }*/
 
     public static double Ellipse_Ellipse(Ellipse ellipse1, Ellipse ellipse2) {
         return AreaOfIntersectionOfPolygons(new EllipseWithPoints(ellipse1), new EllipseWithPoints(ellipse2));
         
-        double left = Math.Min(ellipse1.X, ellipse2.X);
+        /*double left = Math.Min(ellipse1.X, ellipse2.X);
         double right = Math.Max(ellipse1.X+ellipse1.Scaled(ellipse1.Width), ellipse2.X+ellipse2.Scaled(ellipse2.Width));
         double top = Math.Min(ellipse1.Y, ellipse2.Y);
         double bottom = Math.Max(ellipse1.Y+ellipse1.Scaled(ellipse1.Height), ellipse2.Y+ellipse2.Scaled(ellipse2.Height));
@@ -182,7 +190,7 @@ public static class CalculateIntersectionArea {
             }
         }
     
-        return intersectionArea;
+        return intersectionArea;*/
     }
 
     public static double Ellipse_Triangle(Ellipse ellipse, Cone cone) {
@@ -193,7 +201,8 @@ public static class CalculateIntersectionArea {
         return AreaOfIntersectionOfPolygons(new EllipseWithPoints(ellipse), truncatedCone);
     }
     
-    private static bool IsInside(Point cEdgeStart, Point cEdgeEnd, Point sEdge) {
+    // Not working implementations of Sutherland-Hodgman algorithm
+    /*private static bool IsInside(Point cEdgeStart, Point cEdgeEnd, Point sEdge) {
         return (cEdgeEnd.X - cEdgeStart.X) * (sEdge.Y - cEdgeStart.Y) > (cEdgeEnd.Y - cEdgeStart.Y) * (sEdge.X - cEdgeStart.X);
     }
     
@@ -251,18 +260,95 @@ public static class CalculateIntersectionArea {
         }
         
         return finalPolygon.Where(point => !Double.IsNaN(point.X) && !Double.IsNaN(point.Y)).ToArray();
+    }*/
+    
+    /*private static Point Intersect(Point p1, Point p2, Point p3, Point p4) {
+        double xNum = (p1.X*p2.Y - p1.Y*p2.X) * (p3.X-p4.X) - (p1.X-p2.X) * (p3.X*p4.Y - p3.Y*p4.X);
+        double xDen = (p1.X-p2.X) * (p3.Y-p4.Y) - (p1.Y-p2.Y) * (p3.X-p4.X);
+        
+        double yNum = (p1.X*p2.Y - p1.Y*p2.X) * (p3.Y-p4.Y) - (p1.Y-p2.Y) * (p3.X*p4.Y - p3.Y*p4.X);
+        double yDen = (p1.X-p2.X) * (p3.Y-p4.Y) - (p1.Y-p2.Y) * (p3.X-p4.X);
+        
+        return new Point(xNum/xDen, yNum/yDen);
     }
+    
+    private static void Clip(Point[] subjectPolygonPoints, Point start, Point end) {
+        List<Point> newPoints = new List<Point>();
+        
+        for(int i = 0; i < subjectPolygonPoints.Length; i++) {
+            int k = (i + 1) % subjectPolygonPoints.Length;
+            
+            Point ip = subjectPolygonPoints[i];
+            Point kp = subjectPolygonPoints[k];
+            
+            double i_pos = (end.X-start.X) * (ip.Y-start.Y) - (end.Y-start.Y) * (ip.X-start.X);
+            double k_pos = (end.X-start.X) * (kp.Y-start.Y) - (end.Y-start.Y) * (kp.X-start.X);
+            
+            if(i_pos < 0 && k_pos < 0) {
+                newPoints.Add(new Point(kp.X, kp.Y));
+            } else if(i_pos >= 0 && k_pos < 0) {
+                newPoints.Add(Intersect(start, end, ip, kp));
+                newPoints.Add(new Point(kp.X, kp.Y));
+            } else if(i_pos < 0 && k_pos >= 0) {
+                newPoints.Add(Intersect(start, end, ip, kp));
+            }
+        }
+        
+        for(int i = 0; i < newPoints.Count; i++) {
+            subjectPolygonPoints[i] = newPoints[i];
+        }
+    }
+    
+    private static Point[] ClipPolygon(FigureWithPoints subjectPolygon, FigureWithPoints clippingPolygon) {
+        Point[] clippingPolygonPoints = clippingPolygon.Points;
+        Point[] subjectPolygonPoints = subjectPolygon.Points;
+        for(int i = 0; i < clippingPolygonPoints.Length; i++) {
+            int k = (i + 1) % clippingPolygonPoints.Length;
+            
+            Clip(subjectPolygonPoints, clippingPolygonPoints[i], clippingPolygonPoints[k]);
+        }
+        
+        return subjectPolygonPoints.ToArray();
+    }*/
 
     // Area of a convex polygon: http://www.mathwords.com/a/area_convex_polygon.htm
     private static double AreaOfIntersectionOfPolygons(FigureWithPoints polygon1, FigureWithPoints polygon2) {
-        Point[] intersectionPoints = ClipPolygon(polygon1, polygon2);
-        if(intersectionPoints.Length < 3) return 0;
+        Paths64 subj = new Paths64();
+        Paths64 clip = new Paths64();
+        Path64 subjPath = new Path64();
+        foreach(Point p in polygon1.Points) {
+            subjPath.Add(new Point64(p.X, p.Y));
+        }
+        Path64 clipPath = new Path64();
+        foreach(Point p in polygon2.Points) {
+            clipPath.Add(new Point64(p.X, p.Y));
+        }
+        subj.Add(subjPath);
+        clip.Add(clipPath);
+        Paths64 solution = Clipper.Intersect(subj, clip, FillRule.NonZero);
+        
+        if(solution.Count == 0 || solution[0].Count < 3) return 0;
+        Path64 intersectionPoints = solution[0];
+        
+        double result = 0;
+        for(int i = 0; i < intersectionPoints.Count; i++) {
+            int k = (i + 1) % intersectionPoints.Count;
+            result += intersectionPoints[i].X * intersectionPoints[k].Y - 
+                      intersectionPoints[i].Y * intersectionPoints[k].X;
+        }
+        
+        return result/2;
+    
+        //Point[] intersectionPoints = ClipPolygon(polygon1, polygon2);
+        //Console.WriteLine(intersectionPoints.Length);
+        
+        /*if(intersectionPoints.Length < 3) return 0;
         double result = 0;
         for(int i = 0; i < intersectionPoints.Length; i++) {
             result += intersectionPoints[i].X * intersectionPoints[i == intersectionPoints.Length - 1 ? 0 : i + 1].Y - 
                       intersectionPoints[i].Y * intersectionPoints[i == intersectionPoints.Length - 1 ? 0 : i + 1].X;
         }
-        return result/2;
+        return result/2;*/
     }
 
     public static double Triangle_Triangle(Cone cone1, Cone cone2) {

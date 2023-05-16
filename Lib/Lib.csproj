@@ -32,6 +32,9 @@
         <WarningLevel>4</WarningLevel>
     </PropertyGroup>
     <ItemGroup>
+        <Reference Include="Clipper2Lib, Version=1.2.2.0, Culture=neutral, processorArchitecture=MSIL">
+          <HintPath>..\packages\Clipper2.1.2.2\lib\netstandard2.0\Clipper2Lib.dll</HintPath>
+        </Reference>
         <Reference Include="PresentationCore" />
         <Reference Include="PresentationFramework" />
         <Reference Include="System" />
@@ -45,6 +48,12 @@
         <Compile Include="Figures.cs" />
         <Compile Include="Image.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
+    </ItemGroup>
+    <ItemGroup>
+      <Content Include="Clipper2.ico" />
+    </ItemGroup>
+    <ItemGroup>
+      <None Include="packages.config" />
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
     <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

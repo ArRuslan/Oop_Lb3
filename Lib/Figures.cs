@@ -153,8 +153,8 @@ public class FilledCircle : Circle {
     
     public override void Draw(Canvas canvas) {
         System.Windows.Shapes.Ellipse filledCircle = new System.Windows.Shapes.Ellipse() {
-            Width = Scaled(Radius),
-            Height = Scaled(Radius),
+            Width = Scaled(Radius)*2,
+            Height = Scaled(Radius)*2,
             Stroke = Brushes.Black,
             StrokeThickness = 3,
             Fill = Brushes.Black
@@ -237,6 +237,23 @@ public class EllipseWithPoints : FigureWithPoints {
         for (double theta = 0; theta < 2 * Math.PI; theta += step) {
             double x = ellipse.Center.X + ellipse.Scaled(ellipse.Width/2) * Math.Cos(theta);
             double y = ellipse.Center.Y + ellipse.Scaled(ellipse.Height/2) * Math.Sin(theta);
+            points.Add(new Point(x, y));
+        }
+        _points = points.ToArray();
+    }
+}
+
+public class CircleWithPoints : FigureWithPoints {
+    private Point[] _points;
+    public Point[] Points => _points;
+    private const int NUMBER_OF_POINTS = 100;
+        
+    public CircleWithPoints(Circle circle) {
+        List<Point> points = new List<Point>();
+        double step = 2 * Math.PI / NUMBER_OF_POINTS;
+        for (double theta = 0; theta < 2 * Math.PI; theta += step) {
+            double x = circle.Center.X + circle.Scaled(circle.Radius) * Math.Cos(theta);
+            double y = circle.Center.Y + circle.Scaled(circle.Radius) * Math.Sin(theta);
             points.Add(new Point(x, y));
         }
         _points = points.ToArray();
