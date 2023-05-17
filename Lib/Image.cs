@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Windows.Controls;
+using Clipper2Lib;
 
 namespace Lib { 
 [Serializable]
@@ -46,13 +48,24 @@ public class Image : Figure {
     }
 
     public double GetAreasWithIntersections() {
-        double result = 0;
-        foreach(Figure figure1 in Figures) {
-            foreach(Figure figure2 in Figures) {
-                if(figure1 == figure2) continue;
-                result += figure1.GetIntersectionArea(figure2);
-            }
+        Paths64 resultFirures = Figures[0].ToPaths64();
+        for(int i = 1; i < Figures.Count; i++) {
+            Paths64 other = Figures[i].ToPaths64();
+            resultFirures = Clipper.Union(resultFirures, other, FillRule.NonZero);
         }
+        
+        double result = 0;
+        
+        foreach(Path64 figurePoints in resultFirures) {
+            double tmpResult = 0;
+            for(int i = 0; i < figurePoints.Count; i++) {
+                int k = (i + 1) % figurePoints.Count;
+                tmpResult += figurePoints[i].X * figurePoints[k].Y - 
+                             figurePoints[i].Y * figurePoints[k].X;
+            }
+            result += tmpResult / 2;
+        }
+        
         return result;
     }
 
@@ -120,7 +133,5 @@ public class Image : Figure {
             figure.Draw(cv);
         }
     }
-    
-    public override double GetIntersectionArea(Figure figure) => 0;
 }
 }

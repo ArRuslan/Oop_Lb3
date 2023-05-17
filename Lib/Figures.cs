@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using Clipper2Lib;
+using FillRule = System.Windows.Media.FillRule;
+
 // ReSharper disable SuggestVarOrType_SimpleTypes
 // ReSharper disable SuggestVarOrType_BuiltInTypes
 
@@ -65,8 +68,20 @@ public abstract class Figure {
     }
     
     public abstract void Draw(Canvas canvas);
-    
-    public abstract double GetIntersectionArea(Figure figure);
+
+    public Paths64 ToPaths64() {
+        Paths64 result = new Paths64();
+        Path64 path = new Path64();
+        FigureWithPoints f;
+        if(this is Circle) f = new CircleWithPoints((Circle)this);
+        else if(this is Ellipse) f = new EllipseWithPoints((Ellipse)this);
+        else f = (FigureWithPoints)this;
+        foreach(Point p in f.Points) {
+            path.Add(p.ToPoint64());
+        }
+        result.Add(path);
+        return result;
+    }
 }
 
 [Serializable]
@@ -84,6 +99,10 @@ public class Point {
     public override string ToString() {
         return $"Point(X = {X}, Y = {Y})";
     } 
+    
+    public Point64 ToPoint64() {
+        return new Point64(X, Y);
+    }
 }
 
 [Serializable]
@@ -124,19 +143,6 @@ public class Circle : Figure {
         canvas.Children.Add(circle);
         circle.SetValue(Canvas.LeftProperty, X);
         circle.SetValue(Canvas.TopProperty, Y);
-    }
-    
-    public override double GetIntersectionArea(Figure figure) {
-        if(figure is Circle) 
-            return CalculateIntersectionArea.Circle_Circle(this, (Circle)figure);
-        if(figure is Ellipse) 
-            return CalculateIntersectionArea.Circle_Ellipse(this, (Ellipse)figure);
-        if(figure is Cone) 
-            return CalculateIntersectionArea.Circle_Triangle(this, (Cone)figure);
-        if(figure is TruncatedCone) 
-            return CalculateIntersectionArea.Circle_Trapeze(this, (TruncatedCone)figure);
-        
-        return 0;
     }
 }
 
@@ -206,19 +212,6 @@ public class Ellipse : Figure {
         canvas.Children.Add(ellipse);
         ellipse.SetValue(Canvas.LeftProperty, X);
         ellipse.SetValue(Canvas.TopProperty, Y);
-    }
-    
-    public override double GetIntersectionArea(Figure figure) {
-        if(figure is Circle) 
-            return CalculateIntersectionArea.Circle_Ellipse((Circle)figure, this);
-        if(figure is Ellipse) 
-            return CalculateIntersectionArea.Ellipse_Ellipse(this, (Ellipse)figure);
-        if(figure is Cone) 
-            return CalculateIntersectionArea.Ellipse_Triangle(this, (Cone)figure);
-        if(figure is TruncatedCone) 
-            return CalculateIntersectionArea.Ellipse_Trapeze(this, (TruncatedCone)figure);
-            
-        return 0;
     }
 }
 
@@ -321,19 +314,6 @@ public class Cone : Figure, FigureWithPoints {
         
         canvas.Children.Add(triangle);
     }
-    
-    public override double GetIntersectionArea(Figure figure) {
-        if(figure is Circle) 
-            return CalculateIntersectionArea.Circle_Triangle((Circle)figure, this);
-        if(figure is Ellipse) 
-            return CalculateIntersectionArea.Ellipse_Triangle((Ellipse)figure, this);
-        if(figure is Cone) 
-            return CalculateIntersectionArea.Triangle_Triangle(this, (Cone)figure);
-        if(figure is TruncatedCone) 
-            return CalculateIntersectionArea.Triangle_Trapeze(this, (TruncatedCone)figure);
-                
-        return 0;
-    }
 }
 
 [Serializable]
@@ -401,19 +381,6 @@ public class TruncatedCone : Figure, FigureWithPoints {
         trapeze.Data = geometry;
             
         canvas.Children.Add(trapeze);
-    }
-    
-    public override double GetIntersectionArea(Figure figure) {
-        if(figure is Circle) 
-            return CalculateIntersectionArea.Circle_Trapeze((Circle)figure, this);
-        if(figure is Ellipse) 
-            return CalculateIntersectionArea.Ellipse_Trapeze((Ellipse)figure, this);
-        if(figure is Cone) 
-            return CalculateIntersectionArea.Triangle_Trapeze((Cone)figure, this);
-        if(figure is TruncatedCone) 
-            return CalculateIntersectionArea.Trapeze_Trapeze(this, (TruncatedCone)figure);
-                    
-        return 0;
     }
 }
 
