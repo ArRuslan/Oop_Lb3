@@ -48,6 +48,8 @@ public class Image : Figure {
     }
 
     public double GetAreasWithIntersections() {
+        if(Figures.Count == 0) return 0;
+        
         Paths64 resultFirures = Figures[0].ToPaths64();
         for(int i = 1; i < Figures.Count; i++) {
             Paths64 other = Figures[i].ToPaths64();
@@ -116,16 +118,17 @@ public class Image : Figure {
     }
 
     public override string ToString(string p) {
-        Console.WriteLine(GetAreasWithIntersections());
-        
         return $"Image: \n" + 
                $"  Location = {Location}\n" +
                $"  Area = {GetArea()}\n" +
                $"  Perimeter = {GetPerimeter()}\n" +
                $"  Sum of areas = {GetAreas()}\n" +
                $"  Sum of perimeters = {GetPerimeters()}\n" +
+               $"  Area of all figures ~= {GetAreasWithIntersections()}\n" +
                $"  Scale = {Scale}\n" +
-               $"  Figures = [\n{FiguresString}\n  ]";
+               $"  Figures = [\n" +
+               $"{FiguresString}\n" +
+               $"  ]";
     }
     
     public override void Draw(Canvas cv) {

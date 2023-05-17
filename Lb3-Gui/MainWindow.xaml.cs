@@ -42,7 +42,10 @@ namespace Lb3_Gui {
         }
         
         private void FigureInfo_Btn_Click(object sender, RoutedEventArgs e) {
-            MessageBox.Show(SelectedFigure.ToString());
+            string info = SelectedFigure.ToString();
+            Console.WriteLine(info);
+            Console.WriteLine("================================");
+            MessageBox.Show(info);
         }
         
         private static double? ParseDouble(string str) {
